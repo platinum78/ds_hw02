@@ -31,14 +31,14 @@ typedef struct Maze
     int map_len;
     Point start;
     Point exit;
-    char* map;
+    int* map;
 } Maze;
 
 
 Maze* MazeInit(void);
 void MazeRead(FILE*, Maze*);
 void MazeTrim(Maze*);
-char MazePoint(Maze*, int, int);
+int MazePointVal(Maze*, int, int);
 
 
 Maze* MazeInit(void)
@@ -53,7 +53,7 @@ Maze* MazeInit(void)
     pMaze->width = 0;
     pMaze->map_capacity = 64;  // Initially the map has length of 64.
     pMaze->map_len = 0;
-    pMaze->map = (char*)malloc(sizeof(char) * 64);  // Initially allocate array of 64 characters
+    pMaze->map = (int*)malloc(sizeof(int) * 64);  // Initially allocate array of 64 characters
 }
 
 
@@ -63,6 +63,7 @@ void MazeRead(FILE* input, Maze* maze)
     int idx = 0;
     int width = 0, height = 0;
     char cBuf;
+    int nBuf;
     fseek(input, 0, SEEK_SET);
 
     // First loop iteration: read only the first line and find # of elements in a row
@@ -74,14 +75,36 @@ void MazeRead(FILE* input, Maze* maze)
         if (maze->map_len == maze->map_capacity)
         {
             (maze->map_capacity) *= 2;
-            maze->map = (char*)realloc(maze->map, sizeof(char) * (maze->map_capacity));
+            maze->map = (int*)realloc(maze->map, sizeof(int) * (maze->map_capacity));
             printf("Map doubled: current capacity %d \n", maze->map_capacity);
         }
 
-        if (cBuf == '0' || cBuf == 'W' || cBuf == 'w' || cBuf == '*' || 
-            cBuf == 'E' || cBuf == 'e' || cBuf == 'S' || cBuf == 's')
+
+        // Filter input by character
+        // Start: -1, End: -2, Wall: -3, Warp: -4
+        if (cBuf == '0')
+        {
+            (maze->map)[idx++] = 0;
+            width++; (maze->map_len)++;
+        }
+        else if (cBuf == '*')
+        {
+            (maze->map)[idx++] = -3;
+            width++; (maze->map_len)++;
+        }
+        else if (cBuf == 'S' || cBuf == 's')
         {
             (maze->map)[idx++] = cBuf;
+            width++; (maze->map_len)++;
+        }
+        else if (cBuf == 'E' || cBuf == 'e')
+        {
+            (maze->map)[idx++] = -2;
+            width++; (maze->map_len)++;
+        }
+        else if (cBuf == 'W' || cBuf == 'w')
+        {
+            (maze->map)[idx++] = -4;
             width++; (maze->map_len)++;
         }
         else if (cBuf == '\n')
@@ -98,14 +121,33 @@ void MazeRead(FILE* input, Maze* maze)
         if (maze->map_len == maze->map_capacity)
         {
             (maze->map_capacity) *= 2;
-            maze->map = (char*)realloc(maze->map, sizeof(char) * (maze->map_capacity));
+            maze->map = (int*)realloc(maze->map, sizeof(int) * (maze->map_capacity));
             printf("Map doubled: current capacity %d \n", maze->map_capacity);
         }
 
-        if (cBuf == '0' || cBuf == 'W' || cBuf == 'w' || cBuf == '*' || 
-            cBuf == 'C' || cBuf == 'c' || cBuf == 'S' || cBuf == 's')
+        if (cBuf == '0')
         {
-            (maze->map)[idx++] = cBuf;
+            (maze->map)[idx++] = 0;
+            (maze->map_len)++;
+        }
+        else if (cBuf == '*')
+        {
+            (maze->map)[idx++] = -3;
+            (maze->map_len)++;
+        }
+        else if (cBuf == 'S' || cBuf == 's')
+        {
+            (maze->map)[idx++] = -1;
+            (maze->map_len)++;
+        }
+        else if (cBuf == 'E' || cBuf == 'e')
+        {
+            (maze->map)[idx++] = -2;
+            (maze->map_len)++;
+        }
+        else if (cBuf == 'W' || cBuf == 'w')
+        {
+            (maze->map)[idx++] = -4;
             (maze->map_len)++;
         }
         else if (cBuf == '\n')
@@ -113,7 +155,6 @@ void MazeRead(FILE* input, Maze* maze)
             // printf("\n");
         }
     }
-    // printf("\n");
 
     // Now we got the whole file. Calculate the dimension of the map.
     height = idx / width;
@@ -126,10 +167,10 @@ void MazeRead(FILE* input, Maze* maze)
     {
         for (col = 0; col < maze->width; col++)
         {
-            cBuf = MazePoint(maze, row, col);
-            if (cBuf == 'S' || cBuf == 's')
+            nBuf = MazePointVal(maze, row, col);
+            if (nBuf == -1)
                 maze->start = (Point){ .row = row, .col = col };
-            else if (cBuf == 'E' || cBuf == 'e')
+            else if (nBuf == -2)
                 maze->exit = (Point){ .row = row, .col = col };
         }
     }
@@ -147,7 +188,7 @@ void MazeTrim(Maze* maze)
     if (nMazeLen != (maze->map_len))
     {
         // Allocate new map with exact length
-        char* cpNewMap = (char*)malloc(sizeof(char) * nMazeLen);
+        int* cpNewMap = (int*)malloc(sizeof(int) * nMazeLen);
 
         // Copy the values from previous map
         int idx = 0;
@@ -156,12 +197,14 @@ void MazeTrim(Maze* maze)
 
         // Now maze->map is obsolete. Replace it with new map.
         free(maze->map);
+        maze->map_len = nMazeLen;
+        maze->map_capacity = nMazeLen;
         maze->map = cpNewMap;
     }
 }
 
 
-char MazePoint(Maze* maze, int row, int col)
+int MazePointVal(Maze* maze, int row, int col)
 {
     return (maze->map)[row * (maze->width) + col];
 }
@@ -169,7 +212,42 @@ char MazePoint(Maze* maze, int row, int col)
 
 void MazeMarkDist(Maze* maze, int row, int col, int dist)
 {
-    (maze->map)[row * (maze->width) + col] = '0' + dist;
+    (maze->map)[row * (maze->width) + col] = dist;
+}
+
+
+Maze* MazeClone(Maze* maze)
+{
+    Maze* pMaze = (Maze*)malloc(sizeof(Maze));
+    pMaze->map = (int*)malloc(sizeof(int) * (maze->height) * (maze->width));
+    
+    int idx = 0;
+    for (idx = 0; idx < (maze->height) * (maze->width); idx++)
+        (pMaze->map)[idx] = (maze->map)[idx];
+    pMaze->width = maze->width;
+    pMaze->height = maze->height;
+    pMaze->start = maze->start;
+    pMaze->exit = maze->exit;
+    pMaze->map_len = maze->map_len;
+    pMaze->map_capacity = maze->map_capacity;
+
+    return pMaze;
+}
+
+Maze* MazeCopy(Maze* maze_src, Maze* maze_dst)
+{
+    free(maze_dst->map);
+    maze_dst->map = (int*)malloc(sizeof(int) * (maze_src->height) * (maze_src->width));
+
+    int idx;
+    for (idx = 0; idx < (maze_src->height) * (maze_src->width); idx++)
+        (maze_dst->map)[idx] = (maze_src->map)[idx];
+    maze_dst->width = maze_src->width;
+    maze_dst->height = maze_src->height;
+    maze_dst->start = maze_src->start;
+    maze_dst->exit = maze_src->exit;
+    maze_dst->map_len = maze_src->map_len;
+    maze_dst->map_capacity = maze_src->map_capacity;
 }
 
 

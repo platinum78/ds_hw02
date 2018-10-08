@@ -12,7 +12,8 @@ int main(void)
 {
     Point point1;
     Point point2 = { 1, 1 };
-    point1 = point2;
+    point1 = (Point){ 1, 1 };
+    // point1 = point2;
 
     printf("%d \n", PointCmp(point1, point2));
 }

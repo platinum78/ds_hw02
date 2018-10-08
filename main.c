@@ -10,12 +10,17 @@ int main(void)
     FILE* output = fopen("./io/hw2_output.txt", "w");
     printf("File opened. \n");
 
-    // Read the maze
+    // Read the maze and make a clone
     Maze* maze = MazeInit();
     MazeRead(input, maze);
+    Maze* maze_clone = MazeClone(maze);
+    
 
-    Path* pWarpablePath = WarpablePath(maze);
-    Path* pWarplessPath = WarplessPath(maze);
+    Path* pWarplessPath = WarplessPath(maze, BEGIN_START, DESTINATION_EXIT);
+    
+    PrintMazeMap(maze);
+    PrintPath(pWarplessPath, PATH_FORWARD);
+    PrintPath(pWarplessPath, PATH_BACKWARD);
 
 
     return 0;
