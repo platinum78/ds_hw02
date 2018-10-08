@@ -78,16 +78,54 @@ void PathAddPasspoint(Path* path, Point point, int pos)
 void PathFlip(Path* path)
 {
     int nPathLen = path->len;
-    LinkedPoint* pLPNext, *pLPSwap;
+    LinkedPoint* pLPHere, *pLPNext, *pLPSwap;
     pLPNext = path->head;
     int idx;
     for (idx = 0; idx < nPathLen; idx++)
     {
-        pLPSwap = pLPNext->next;
-        pLPNext->next = pLPNext->previous;
-        pLPNext->previous = pLPSwap;
-        pLPNext = pLPNext->previous;
+        pLPHere = pLPNext;
+        pLPNext = pLPNext->next;
+        
+        pLPSwap = pLPHere->next;
+        pLPHere->next = pLPHere->previous;
+        pLPHere->previous = pLPSwap;
     }
+    pLPSwap = path->head;
+    path->head = path->tail;
+    path->tail = pLPSwap;
+}
+
+
+Path* PathMerge(Path* path1, Path* path2)
+{
+    // Get total length of new path
+    int nPathLen = path1->len + path2->len;
+    printf("Length of new path: %d \n", path1->len);
+
+    // Create a new Path instance
+    Path* pPath = (Path*)malloc(sizeof(Path));
+
+    // Copy first object of path 1
+    LinkedPoint* pLPNext = path1->head;
+    PathAddPasspoint(pPath, pLPNext->point, PATH_TAIL);
+    pLPNext = pLPNext->next;
+    
+    // Continue copying objects from path 1
+    int idx = 0;
+    for (idx = 1; idx < path1->len; idx++)
+    {
+        PathAddPasspoint(pPath, pLPNext->point, PATH_TAIL);
+        pLPNext = pLPNext->next;
+    }
+
+    pLPNext = path2->head;
+    for (idx = 0; idx < path2->len; idx++)
+    {
+        PathAddPasspoint(pPath, pLPNext->point, PATH_TAIL);
+        pLPNext = pLPNext->next;
+    }
+
+    return pPath;
 }
 
 

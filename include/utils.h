@@ -37,6 +37,7 @@ void PrintPath(Path* path, int direction)
 {
     int idx;
     int nPathLen = path->len;
+    printf("nPathLen: %d \n", nPathLen);
     
     if (direction == PATH_FORWARD)
     {

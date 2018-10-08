@@ -17,10 +17,10 @@ int main(void)
     
 
     Path* pWarplessPath = WarplessPath(maze, BEGIN_START, DESTINATION_EXIT);
+    Path* pWarpablePath = WarpablePath(maze);
     
-    PrintMazeMap(maze);
     PrintPath(pWarplessPath, PATH_FORWARD);
-    PrintPath(pWarplessPath, PATH_BACKWARD);
+    PrintPath(pWarpablePath, PATH_FORWARD);
 
 
     return 0;

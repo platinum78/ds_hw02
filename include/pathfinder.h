@@ -15,6 +15,7 @@
 #include <time.h>
 #include "./maze.h"
 #include "./path.h"
+#include "./utils.h"
 
 
 typedef struct PointQueue
@@ -105,9 +106,9 @@ Point PointQueueDelete(PointQueue* queue)
 
 Path* WarplessPath(Maze* maze, int start, int dest);
 Path* WarpablePath(Maze* maze);
-int CheckMobility(Maze* maze, Point point);
+int CheckMobility(Maze* maze, Point point, int start);
 int BackTrack(Maze* maze, Point point, int dist);
-int BackTrack_Vanilla(Maze* maze, Point point, int dist);
+int BackTrack_Vanilla(Maze* maze, Point point, int dist, int dest);
 
 
 Path* WarplessPath(Maze* maze, int start, int dest)
@@ -117,6 +118,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
     PointQueue* pQueue = PointQueueInit();
     Point PointOld, PointNew;
     Point PointStart, PointDest;  // Default destination is the exit point. Might change if wanted.
+    Maze* maze_clone = MazeClone(maze);
     
     // Set buffers for function operation
     int bDestFound = FALSE;
@@ -127,14 +129,14 @@ Path* WarplessPath(Maze* maze, int start, int dest)
 
     // Trigger by pushing starting point of the maze
     if (start == BEGIN_START)
-        PointStart = maze->start;
+        PointStart = maze_clone->start;
     else if (start == BEGIN_EXIT)
-        PointStart = maze->exit;
+        PointStart = maze_clone->exit;
     PointQueuePush(pQueue, PointStart);
 
     // Iterate until destination is found
     idx2 = 0;
-    while (bDestFound == FALSE && idx2 < 50)
+    while (bDestFound == FALSE)
     {
         idx2++;
         nDist++;
@@ -150,7 +152,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
             printf("%d, %d deleted from queue \n", PointOld.row, PointOld.col);
             
             // Check mobility of the obtained point.
-            nMobility = CheckMobility(maze, PointOld);
+            nMobility = CheckMobility(maze_clone, PointOld, start);
 
             // Check mobilities to each diretions
             if (nMobility & 0b1000)  // Can move to right
@@ -160,19 +162,20 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 PointNew = (Point){ .row = PointOld.row, .col = PointOld.col + 1 };
 
                 // Check if the new point is the destination
-                if (MazePointVal(maze, PointNew.row, PointNew.col) == dest)
+                if (MazePointVal(maze_clone, PointNew.row, PointNew.col) == dest)
                 {
                     printf("bDestFound @ right \n");
-                    MazeMarkDist(maze, PointNew.row, PointNew.col, nDist);
+                    MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                     PointDest = PointNew;
                     bDestFound = TRUE;
+                    break;
                 }
                 else
                 {
                     // If not destination, push this point into the queue and mark the distance
                     PointQueuePush(pQueue, PointNew);
                     printf("%d, %d added to queue \n", PointNew.row, PointNew.col);
-                    MazeMarkDist(maze, PointNew.row, PointNew.col, nDist);
+                    MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                 }
             }
 
@@ -182,19 +185,20 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 PointNew = (Point){ .row = PointOld.row - 1, .col = PointOld.col };
 
                 // Check if the new point is the destination
-                if (MazePointVal(maze, PointNew.row, PointNew.col) == dest)
+                if (MazePointVal(maze_clone, PointNew.row, PointNew.col) == dest)
                 {
                     printf("bDestFound @ up \n");
-                    MazeMarkDist(maze, PointNew.row, PointNew.col, nDist);
+                    MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                     PointDest = PointNew;
                     bDestFound = TRUE;
+                    break;
                 }
                 else
                 {
                     // If not destination, push this point into the queue and mark the distance
                     PointQueuePush(pQueue, PointNew);
                     printf("%d, %d added to queue \n", PointNew.row, PointNew.col);
-                    MazeMarkDist(maze, PointNew.row, PointNew.col, nDist);
+                    MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                 }
             }
 
@@ -204,19 +208,20 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 PointNew = (Point){ .row = PointOld.row, .col = PointOld.col - 1 };
 
                 // Check if the new point is the destination
-                if (MazePointVal(maze, PointNew.row, PointNew.col) == dest)
+                if (MazePointVal(maze_clone, PointNew.row, PointNew.col) == dest)
                 {
                     printf("bDestFound @ left \n");
-                    MazeMarkDist(maze, PointNew.row, PointNew.col, nDist);
+                    MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                     PointDest = PointNew;
                     bDestFound = TRUE;
+                    break;
                 }
                 else
                 {
                     // If not destination, push this point into the queue and mark the distance
                     PointQueuePush(pQueue, PointNew);
                     printf("%d, %d added to queue \n", PointNew.row, PointNew.col);
-                    MazeMarkDist(maze, PointNew.row, PointNew.col, nDist);
+                    MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                 }
             }
 
@@ -226,39 +231,38 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 PointNew = (Point){ .row = PointOld.row + 1, .col = PointOld.col };
 
                 // Check if the new point is the destination
-                if (MazePointVal(maze, PointNew.row, PointNew.col) == dest)
+                if (MazePointVal(maze_clone, PointNew.row, PointNew.col) == dest)
                 {
                     printf("bDestFound @ down \n");
-                    MazeMarkDist(maze, PointNew.row, PointNew.col, nDist);
+                    MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                     PointDest = PointNew;
                     bDestFound = TRUE;
+                    break;
                 }
                 else
                 {
                     // If not destination, push this point into the queue and mark the distance
                     PointQueuePush(pQueue, PointNew);
                     printf("%d, %d added to queue \n", PointNew.row, PointNew.col);
-                    MazeMarkDist(maze, PointNew.row, PointNew.col, nDist);
+                    MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                 }
             }
             if (bDestFound == TRUE)
                 printf("Found Destination! \n");
         }
-
-        
     }
     
     // Now found the movement map. Now backtrace to the origin.
     // First, copy the destination index
     PointNew = PointDest;  // Use PointNew as a buffer of Point type
-    nDist = MazePointVal(maze, PointNew.row, PointNew.col);
+    nDist = MazePointVal(maze_clone, PointNew.row, PointNew.col);
     PathAddPasspoint(pPath, PointNew, PATH_HEAD);
     idx2 = 0;
     while (PointCmp(PointNew, PointStart) == 0 && idx2 < 50)
     {
         idx2++;
         // Retrieve direction information
-        nDirection = BackTrack_Vanilla(maze, PointNew, nDist);
+        nDirection = BackTrack_Vanilla(maze_clone, PointNew, nDist, start);
 
         // Move PointNew according to the value of nDirection
         switch(nDirection)
@@ -294,41 +298,82 @@ Path* WarpablePath(Maze* maze)
      * the starting point, and then another nearest warping point from the exit
      * point.
      */
-    Path* pPath = PathInit();
+    Path* pPath1 = PathInit();
+    Path* pPath2 = PathInit();
+    Maze* maze_backup = MazeClone(maze);
+
+    pPath1 = WarplessPath(maze, BEGIN_START, DESTINATION_WARP);
+    
+    MazeCopy(maze_backup, maze);
+    pPath2 = WarplessPath(maze, BEGIN_EXIT, DESTINATION_WARP);
+    PathFlip(pPath2);
+
+    Path* pPathMerged = PathMerge(pPath1, pPath2);
+
+    return pPathMerged;
 }
 
 
-int CheckMobility(Maze* maze, Point point)
+int CheckMobility(Maze* maze, Point point, int start)
 {
     // Check if movable to E, N, W, S, and return an integer in binary info.
     int nMobility = 0;
     int row, col;
 
-    // Check if rightward movement is available.
-    row = point.row; col = point.col + 1;
-    if (col < maze->width)
-        if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
-            nMobility += 0b1000;
+    if (start == BEGIN_START)
+    {    
+        // Check if rightward movement is available.
+        row = point.row; col = point.col + 1;
+        if (col < maze->width)
+            if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
+                nMobility += 0b1000;
 
-    // Check if upward movement is available.
-    row = point.row - 1; col = point.col;
-    if (row >= 0)
-        if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
-            nMobility += 0b0100;
+        // Check if upward movement is available.
+        row = point.row - 1; col = point.col;
+        if (row >= 0)
+            if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
+                nMobility += 0b0100;
 
-    // Check if leftward movement is available.
-    row = point.row; col = point.col - 1;
-    if (col >= 0)
-        if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
-            nMobility += 0b0010;
-    
-    // Check if downward movement is available.
-    row = point.row + 1; col = point.col;
-    if (row < maze->height)
-        if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
-            nMobility += 0b0001;
-    
-    // printf("%d \n", nMobility);
+        // Check if leftward movement is available.
+        row = point.row; col = point.col - 1;
+        if (col >= 0)
+            if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
+                nMobility += 0b0010;
+        
+        // Check if downward movement is available.
+        row = point.row + 1; col = point.col;
+        if (row < maze->height)
+            if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
+                nMobility += 0b0001;
+        
+        // printf("%d \n", nMobility);
+    }
+    else if (start == BEGIN_EXIT)
+    {
+        // Check if rightward movement is available.
+        row = point.row; col = point.col + 1;
+        if (col < maze->width)
+            if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -1)
+                nMobility += 0b1000;
+
+        // Check if upward movement is available.
+        row = point.row - 1; col = point.col;
+        if (row >= 0)
+            if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -1)
+                nMobility += 0b0100;
+
+        // Check if leftward movement is available.
+        row = point.row; col = point.col - 1;
+        if (col >= 0)
+            if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -1)
+                nMobility += 0b0010;
+        
+        // Check if downward movement is available.
+        row = point.row + 1; col = point.col;
+        if (row < maze->height)
+            if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -1)
+                nMobility += 0b0001;
+    }
     return nMobility;
 }
 
@@ -373,14 +418,14 @@ int BackTrack(Maze* maze, Point point, int dist)
 }
 
 
-int BackTrack_Vanilla(Maze* maze, Point point, int dist)
+int BackTrack_Vanilla(Maze* maze, Point point, int dist, int start)
 {
     // Check if movable to E, N, W, S, and return an integer in binary info.
     int nDirection = 0;
     int row, col;
     int nNext;
     if (dist == 1)
-        nNext = -1;
+        nNext = start;
     else
         nNext = dist - 1;
 
