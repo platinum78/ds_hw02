@@ -62,4 +62,38 @@ void PrintPath(Path* path, int direction)
     printf("\n");
 }
 
+
+void WritePath(FILE* output, Path* path, int direction)
+{
+    int idx;
+    int nPathLen = path->len;
+    printf("nPathLen: %d \n", nPathLen);
+    fprintf(output, "%d \n", path->len - 1);
+    if (direction == PATH_FORWARD)
+    {
+        LinkedPoint* pLPoint = path->head;
+
+        for (idx = 0; idx < nPathLen; idx++)
+        {
+            fprintf(output, "(%d,%d)", (pLPoint->point).row, (pLPoint->point).col);
+            if (idx < nPathLen - 1)
+                fprintf(output, ", ");
+            pLPoint = pLPoint->next;
+        }
+    }
+    else if (direction == PATH_BACKWARD)
+    {
+        LinkedPoint* pLPoint = path->tail;
+
+        for (idx = 0; idx < nPathLen; idx++)
+        {
+            fprintf(output, "(%d,%d)", (pLPoint->point).row, (pLPoint->point).col);
+            if (idx < nPathLen - 1)
+                fprintf(output, ", ");
+            pLPoint = pLPoint->previous;
+        }
+    }
+    printf("\n");
+}
+
 #endif

@@ -21,7 +21,11 @@ int main(void)
     
     PrintPath(pWarplessPath, PATH_FORWARD);
     PrintPath(pWarpablePath, PATH_FORWARD);
-
+    
+    if (pWarpablePath->len < pWarplessPath->len)
+        WritePath(output, pWarpablePath, PATH_FORWARD);
+    else
+        WritePath(output, pWarplessPath, PATH_FORWARD);
 
     return 0;
 }
