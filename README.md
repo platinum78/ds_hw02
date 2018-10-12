@@ -10,7 +10,7 @@ Using the program is simple. Just following the instruction below.
 4. Run the program with no option.
 5. The output file will emerge in the same diredtory with the input file.
 
-This program is tested on Linux os (Ubuntu 18.04). Please use Linux when evaluating this assignment.
+This program is tested on both Windows 10 (build 1803) and Linux OS (Ubuntu 18.04).
 
 <br>
 
@@ -38,16 +38,17 @@ This makes the problem seem more difficult, but actually it's just a trick,
 and does not make the problem significantly more difficult.
 
 Since it costs no energy to move between warping points,
-how far the two parping points are does not matter at all.
-Therefore, what we should consider is to minimizing the energy cost while moving
+how far the two warping points are does not matter at all.
+Therefore, what we should consider is to minimize the energy cost while moving
 from the starting point to the warping zone, and then from another warping zone to the exit point.
-The problem indeed reduced into finding two shortest route!
+The problem indeed reduced into finding two shortest routes!
 
-One thing to note is that, unlike finding the nearest warping zone from the starting point,
-it is unclear which warping point is the closest to the exit point.
-Therefore, to find the shortest path between the warping zone to the exit point,
-we can't use forward path. Instead, we can use a backward path, which starts from the exit point.
+One possible confusion is the 'underground tunnel' case; which there is no warpless path but warpable path exists.
+This happens when starting point and exit point are isolated by walls, but each side have at least one warping zone.
+However, since finding the shortest route from the starting/exit point to the warping zone would indicate if there is
+any warping zone on that side, this situation does not need any separate classification procedure.
 
+Therefore, the provided methods will cover all cases.
 After that, we can flip the path, and then merge it with the path from starting point to warping zone.
 
 In summary, the operating procedure of the program is as follows.
@@ -63,3 +64,11 @@ In summary, the operating procedure of the program is as follows.
 <br>
 
 ## 4. Performance Analysis
+
+This algorithm differs its number of iterations significantly case-by-case.
+Therefore, it's not easy to find the general Theta(g(n)) of the algorithm.
+Considering o(g(n)), since both the I/O operation and path finding sweeps
+n x m cells at maximum, at least o(g(mn)) could be considered true.
+
+In case of warpable paths, it is likely that the number of operations
+in path finding would significantly decrease.

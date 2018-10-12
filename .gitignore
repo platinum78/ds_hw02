@@ -1,4 +1,5 @@
 main
 testbox
+*.exe
 .vscode
 .vscode/*

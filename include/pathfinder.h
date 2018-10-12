@@ -15,7 +15,7 @@
 #include <time.h>
 #include "./maze.h"
 #include "./path.h"
-#include "./utils.h"
+// #include "./utils.h"
 
 
 typedef struct PointQueue
@@ -60,7 +60,6 @@ void PointQueuePush(PointQueue* queue, Point point)
     else
     {
         // Simply add the new LinkedPoint onto the edge of queue.
-        printf("%p \n", queue->tail);
         (queue->tail)->next = pLPoint;
         queue->tail = pLPoint;
     }
@@ -143,21 +142,19 @@ Path* WarplessPath(Maze* maze, int start, int dest)
         printf("\nIteration %d \n", idx2);
         nQLenPrev = pQueue->len;  // Retrieve queue length.
 
-        // Stop working if queue is null: no path!
+        // Stop working if queue is empty: no path!
         if (nQLenPrev == 0)
         {
             printf("No path found! \n");
             return NULL;
         }
 
-        printf("Queue size: %d \n", nQLenPrev);
-
         // Get point info while deleting from queue, and check mobility.
         for (idx1 = 0; idx1 < nQLenPrev; idx1++)
         {
             // Delete from queue and get the point
             PointOld = PointQueueDelete(pQueue);
-            printf("%d, %d deleted from queue \n", PointOld.row, PointOld.col);
+            printf("-(%d,%d) \n", PointOld.row, PointOld.col);
             
             // Check mobility of the obtained point.
             nMobility = CheckMobility(maze_clone, PointOld, start);
@@ -172,7 +169,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 // Check if the new point is the destination
                 if (MazePointVal(maze_clone, PointNew.row, PointNew.col) == dest)
                 {
-                    printf("bDestFound @ right \n");
+                    printf("Destination Found! \n");
                     MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                     PointDest = PointNew;
                     bDestFound = TRUE;
@@ -182,7 +179,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 {
                     // If not destination, push this point into the queue and mark the distance
                     PointQueuePush(pQueue, PointNew);
-                    printf("%d, %d added to queue \n", PointNew.row, PointNew.col);
+                    printf("+(%d,%d) \n", PointNew.row, PointNew.col);
                     MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                 }
             }
@@ -195,7 +192,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 // Check if the new point is the destination
                 if (MazePointVal(maze_clone, PointNew.row, PointNew.col) == dest)
                 {
-                    printf("bDestFound @ up \n");
+                    printf("Destination Found! \n");
                     MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                     PointDest = PointNew;
                     bDestFound = TRUE;
@@ -205,7 +202,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 {
                     // If not destination, push this point into the queue and mark the distance
                     PointQueuePush(pQueue, PointNew);
-                    printf("%d, %d added to queue \n", PointNew.row, PointNew.col);
+                    printf("+(%d,%d) \n", PointNew.row, PointNew.col);
                     MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                 }
             }
@@ -218,7 +215,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 // Check if the new point is the destination
                 if (MazePointVal(maze_clone, PointNew.row, PointNew.col) == dest)
                 {
-                    printf("bDestFound @ left \n");
+                    printf("Destination Found! \n");
                     MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                     PointDest = PointNew;
                     bDestFound = TRUE;
@@ -228,7 +225,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 {
                     // If not destination, push this point into the queue and mark the distance
                     PointQueuePush(pQueue, PointNew);
-                    printf("%d, %d added to queue \n", PointNew.row, PointNew.col);
+                    printf("+(%d,%d) \n", PointNew.row, PointNew.col);
                     MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                 }
             }
@@ -241,7 +238,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 // Check if the new point is the destination
                 if (MazePointVal(maze_clone, PointNew.row, PointNew.col) == dest)
                 {
-                    printf("bDestFound @ down \n");
+                    printf("Destination Found! \n");
                     MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                     PointDest = PointNew;
                     bDestFound = TRUE;
@@ -251,7 +248,7 @@ Path* WarplessPath(Maze* maze, int start, int dest)
                 {
                     // If not destination, push this point into the queue and mark the distance
                     PointQueuePush(pQueue, PointNew);
-                    printf("%d, %d added to queue \n", PointNew.row, PointNew.col);
+                    printf("+(%d,%d) \n", PointNew.row, PointNew.col);
                     MazeMarkDist(maze_clone, PointNew.row, PointNew.col, nDist);
                 }
             }
@@ -311,9 +308,13 @@ Path* WarpablePath(Maze* maze)
     Maze* maze_backup = MazeClone(maze);
 
     pPath1 = WarplessPath(maze, BEGIN_START, DESTINATION_WARP);
+    if (pPath1 == NULL)
+        return NULL;
     
     MazeCopy(maze_backup, maze);
     pPath2 = WarplessPath(maze, BEGIN_EXIT, DESTINATION_WARP);
+    if (pPath2 == NULL)
+        return NULL;
     PathFlip(pPath2);
 
     Path* pPathMerged = PathMerge(pPath1, pPath2);
@@ -353,8 +354,6 @@ int CheckMobility(Maze* maze, Point point, int start)
         if (row < maze->height)
             if (MazePointVal(maze, row, col) == 0 || MazePointVal(maze, row, col) == -4 || MazePointVal(maze, row, col) == -2)
                 nMobility += 0b0001;
-        
-        // printf("%d \n", nMobility);
     }
     else if (start == BEGIN_EXIT)
     {
@@ -420,8 +419,7 @@ int BackTrack(Maze* maze, Point point, int dist)
     if (row < maze->height)
         if (MazePointVal(maze, row, col) == nNext)
             nDirection += 0b0001;
-    
-    // printf("%d \n", nDirection);
+
     return nDirection;
 }
 
