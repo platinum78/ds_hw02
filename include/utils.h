@@ -96,4 +96,10 @@ void WritePath(FILE* output, Path* path, int direction)
     printf("\n");
 }
 
+
+void WriteNull(FILE* output)
+{
+    fprintf(output, "NULL \n");
+}
+
 #endif

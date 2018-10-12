@@ -134,14 +134,22 @@ Path* WarplessPath(Maze* maze, int start, int dest)
         PointStart = maze_clone->exit;
     PointQueuePush(pQueue, PointStart);
 
-    // Iterate until destination is found
     idx2 = 0;
+    // Iterate until destination is found
     while (bDestFound == FALSE)
     {
         idx2++;
         nDist++;
         printf("\nIteration %d \n", idx2);
         nQLenPrev = pQueue->len;  // Retrieve queue length.
+
+        // Stop working if queue is null: no path!
+        if (nQLenPrev == 0)
+        {
+            printf("No path found! \n");
+            return NULL;
+        }
+
         printf("Queue size: %d \n", nQLenPrev);
 
         // Get point info while deleting from queue, and check mobility.

@@ -13,10 +13,16 @@ int main(void)
     // Read the maze and make a clone
     Maze* maze = MazeInit();
     MazeRead(input, maze);
-    Maze* maze_clone = MazeClone(maze);
     
 
     Path* pWarplessPath = WarplessPath(maze, BEGIN_START, DESTINATION_EXIT);
+
+    if (pWarplessPath == NULL)
+    {
+        WriteNull(output);
+        return 0;
+    }
+
     Path* pWarpablePath = WarpablePath(maze);
     
     PrintPath(pWarplessPath, PATH_FORWARD);

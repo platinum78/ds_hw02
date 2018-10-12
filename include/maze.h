@@ -54,6 +54,8 @@ Maze* MazeInit(void)
     pMaze->map_capacity = 64;  // Initially the map has length of 64.
     pMaze->map_len = 0;
     pMaze->map = (int*)malloc(sizeof(int) * 64);  // Initially allocate array of 64 characters
+    
+    return pMaze;
 }
 
 
