@@ -1,16 +1,21 @@
 # Programming Assignment #2 - Maze Escape
 
+Data Structure SWE2015-41, School of Software, SKKU <br>
+Susung Park (2014311254), School of Mechanical Engineering, SKKU
+
+<br>
+
 ## 1. Just tell me how to use it!
 
 Using the program is simple. Just following the instruction below.
 
 1. Open the assignment directory from the console.
-2. Compile the source via gcc by typing `gcc main.c -o main`
-3. Put your input file in `{ASSIGNMENT_DIR}/io`.
+2. Compile the source via gcc by typing `gcc -o main.exe ./include/datatypes.c ./include/pathfinder.c ./main.c`
+3. Put your input file in `{ASSIGNMENT_DIR}/io`. Input file should have the name `hw2_input.txt`.
 4. Run the program with no option.
 5. The output file will emerge in the same diredtory with the input file.
 
-This program is tested on both Windows 10 (build 1803) and Linux OS (Ubuntu 18.04).
+This program is tested on Windows 10 (build 1803).
 
 <br>
 
@@ -26,13 +31,21 @@ In this CoC, the program finds the shortest path.
 
 <br>
 
-## 3. Problem Analysis
+## 3. Operations
+
+The data types and operations are arranged in the `datatypes.h` header.
+Please refer to this file to see which operations are implemented.
+
+<br>
+
+## 4. Problem Analysis
 
 ### 1. Algorithms
 
 The identical algorithm with that from class is applied for plain path-finding.
 
 ### 2. Warping?
+
 The real problem is that there are some *'warping zones'* in this assignment.
 This makes the problem seem more difficult, but actually it's just a trick,
 and does not make the problem significantly more difficult.
@@ -77,4 +90,8 @@ in path finding would significantly decrease.
 
 ## 5. Benchmarks
 
-This program 
+This program is written and tested on my workstation.
+The specs of the workstation are: Windows 10 Pro (build 1803), AMD Ryzen 2700X (~4GHz), 32G DDR4 RAM
+
+Using the default input, approximately 5ms is required.
+Using a maze input with 550 x 100, approximately 50ms is required.
