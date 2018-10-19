@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <time.h>
-#include "./include/maze.h"
-#include "./include/path.h"
 #include "./include/pathfinder.h"
 #include "./include/utils.h"
 
@@ -17,49 +15,15 @@ int main(void)
     MazeRead(input, maze);
     
 
-    Path* pWarplessPath = WarplessPath(maze, BEGIN_START, DESTINATION_EXIT);
+    Path* pWarplessPath = WarplessPath(maze, START, EXIT);
     Path* pWarpablePath = WarpablePath(maze);
 
-    if (pWarplessPath != NULL && pWarpablePath != NULL)
-    {
-        // Print each path to console
-        printf("Warpless Path: ");
-        PrintPath(pWarplessPath, PATH_FORWARD);
-        printf("Warpable Path: ");
-        PrintPath(pWarpablePath, PATH_FORWARD);
-
-        if (pWarpablePath->len < pWarplessPath->len)
-            WritePath(output, pWarpablePath, PATH_FORWARD);
-        else
-            WritePath(output, pWarplessPath, PATH_FORWARD);
-    }
-    else if (pWarplessPath != NULL && pWarpablePath == NULL)
-    {
-        // Print each path to console
-        printf("Warpless Path: ");
-        PrintPath(pWarplessPath, PATH_FORWARD);
-        printf("Warpable Path: none");
-
-        WritePath(output, pWarplessPath, PATH_FORWARD);
-    }
-    else if (pWarplessPath == NULL && pWarpablePath != NULL)
-    {
-        // Print each path to console
-        printf("Warpless Path: none");
-        printf("Warpable Path: ");
-        PrintPath(pWarpablePath, PATH_FORWARD);
-
-        // Write path to output
-        WritePath(output, pWarplessPath, PATH_FORWARD);
-    }
-    else
-    {
-        WriteNull(output);
-        return 0;
-    }
+    WritePath(output, pWarplessPath, pWarpablePath);
+    PathDelete(pWarpablePath); PathDelete(pWarplessPath);
+    MazeDelete(maze);
     clock_t toc = clock();
 
-    printf("%f seconds elapsed! \n", (double)(toc-tic)/CLOCKS_PER_SEC * 1000);
+    printf("%f milliseconds elapsed! \n", (double)(toc-tic)/CLOCKS_PER_SEC * 1000);
 
     return 0;
 }

@@ -72,3 +72,9 @@ n x m cells at maximum, at least o(g(mn)) could be considered true.
 
 In case of warpable paths, it is likely that the number of operations
 in path finding would significantly decrease.
+
+<br>
+
+## 5. Benchmarks
+
+This program 
