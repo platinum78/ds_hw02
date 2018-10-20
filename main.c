@@ -21,6 +21,7 @@ int main(void)
     WritePath(output, pWarplessPath, pWarpablePath);
     PathDelete(pWarpablePath); PathDelete(pWarplessPath);
     MazeDelete(maze);
+    fclose(input); fclose(output);
     clock_t toc = clock();
 
     printf("%f milliseconds elapsed! \n", (double)(toc-tic)/CLOCKS_PER_SEC * 1000);

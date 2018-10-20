@@ -55,7 +55,8 @@ void PrintPath(Path* path, int direction)
 
         for (idx = 0; idx < nPathLen; idx++)
         {
-            printf("(%d,%d) ", (pLPoint->point).row, (pLPoint->point).col);
+            printf("(%3d,%3d) ", (pLPoint->point).row, (pLPoint->point).col);
+            if (idx % 10 == 0) printf("\n");
             pLPoint = pLPoint->next;
         }
     }
@@ -65,7 +66,8 @@ void PrintPath(Path* path, int direction)
 
         for (idx = 0; idx < nPathLen; idx++)
         {
-            printf("(%d,%d) ", (pLPoint->point).row, (pLPoint->point).col);
+            printf("(%3d,%3d) ", (pLPoint->point).row, (pLPoint->point).col);
+            if (idx % 10 == 0) printf("\n");
             pLPoint = pLPoint->previous;
         }
     }
@@ -78,9 +80,9 @@ void WritePath(FILE* output, Path* pWarplessPath, Path* pWarpablePath)
     if (pWarplessPath != NULL && pWarpablePath != NULL)
     {
         // Print each path to console
-        printf("Warpless Path: ");
+        printf("Warpless Path \n");
         PrintPath(pWarplessPath, PATH_FORWARD);
-        printf("Warpable Path: ");
+        printf("Warpable Path \n");
         PrintPath(pWarpablePath, PATH_FORWARD);
 
         if (pWarpablePath->len < pWarplessPath->len)
@@ -91,7 +93,7 @@ void WritePath(FILE* output, Path* pWarplessPath, Path* pWarpablePath)
     else if (pWarplessPath != NULL && pWarpablePath == NULL)
     {
         // Print each path to console
-        printf("Warpless Path: ");
+        printf("Warpless Path \n");
         PrintPath(pWarplessPath, PATH_FORWARD);
         printf("Warpable Path: none \n");
 
@@ -101,7 +103,7 @@ void WritePath(FILE* output, Path* pWarplessPath, Path* pWarpablePath)
     {
         // Print each path to console
         printf("Warpless Path: none");
-        printf("Warpable Path: ");
+        printf("Warpable Path: \n");
         PrintPath(pWarpablePath, PATH_FORWARD);
 
         // Write path to output
@@ -109,6 +111,7 @@ void WritePath(FILE* output, Path* pWarplessPath, Path* pWarpablePath)
     }
     else
     {
+        printf("No path! \n");
         WriteNull(output);
     }
 }
@@ -116,32 +119,31 @@ void WritePath(FILE* output, Path* pWarplessPath, Path* pWarpablePath)
 
 void WritePathWorker(FILE* output, Path* path, int direction)
 {
-    int idx;
+    int idx = 0;
     int nPathLen = path->len;
-    // printf("nPathLen: %d \n", nPathLen);
-    fprintf(output, "%d \n", path->len - 1);
+    fprintf(output, "%d \n", nPathLen - 1);
     if (direction == PATH_FORWARD)
     {
         LinkedPoint* pLPoint = path->head;
 
-        while (pLPoint->next != NULL)
+        for (idx = 0; idx < nPathLen; idx++)
         {
             fprintf(output, "(%d,%d)", (pLPoint->point).row, (pLPoint->point).col);
+            pLPoint = pLPoint->next;
             if (idx < nPathLen - 1)
                 fprintf(output, ", ");
-            pLPoint = pLPoint->next;
         }
     }
     else if (direction == PATH_BACKWARD)
     {
         LinkedPoint* pLPoint = path->tail;
 
-        while (pLPoint->previous != NULL)
+        for (idx = 0; idx < nPathLen; idx++)
         {
             fprintf(output, "(%d,%d)", (pLPoint->point).row, (pLPoint->point).col);
+            pLPoint = pLPoint->previous;
             if (idx < nPathLen - 1)
                 fprintf(output, ", ");
-            pLPoint = pLPoint->previous;
         }
     }
     printf("\n");
