@@ -68,8 +68,8 @@ In summary, the operating procedure of the program is as follows.
 
 1. For warpless paths, run route-finding algorithm learned in class.
 2. For warpable paths,
-   * Find a forward path from the starting point to warping zone.
-   * Find a backward path from the exit point to warping zone.
+   * Find a forward path from the starting point to the closest warping zone.
+   * Find a backward path from the exit point to the closest warping zone.
    * Flip the backward path to make a forward path.
    * Merge two paths into one.
 3. Compare the warpless and warpable paths, and write one with shorter distance.
@@ -80,11 +80,15 @@ In summary, the operating procedure of the program is as follows.
 
 This algorithm differs its number of iterations significantly case-by-case.
 Therefore, it's not easy to find the general Theta(g(n)) of the algorithm.
-Considering o(g(n)), since both the I/O operation and path finding sweeps
-n x m cells at maximum, at least o(g(mn)) could be considered true.
+However, assuming the worst case, which is the case that there is no wall and the start and exit points are diagonally opposite, we can find the asymptotic expression.
+Since the algorithm would seek for all points in the maze map, time complexity will be **O(mn)** when the size of map is m x n.
 
-In case of warpable paths, it is likely that the number of operations
-in path finding would significantly decrease.
+In case of warpable paths, it is likely that the number of operations in path finding would significantly decrease.
+Nevertheless, when there is only one or no warping zone, the amount of path-finding calculation will be equal to that of worst case in warpless paths.
+However, these exceptions are not handled, for the following reasons.
+
+* Algorithm is not heavy enough to make the user feel uncomfortable.
+* Not only the number of warping zone but also the relative location to the walls is important. This might require *semantic* analysis on morphology of maze map.
 
 <br>
 
@@ -93,5 +97,6 @@ in path finding would significantly decrease.
 This program is written and tested on my workstation.
 The specs of the workstation are: Windows 10 Pro (build 1803), AMD Ryzen 2700X (~4GHz), 32G DDR4 RAM
 
-Using the default input, approximately 5ms is required.
+Using the default input, approximately 3-5ms is required.
 Using a maze input with 550 x 100, approximately 50ms is required.
+Using a maze input with 10000 x 200, approximately 540ms is required.

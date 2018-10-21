@@ -10,38 +10,10 @@
 #include "./pathfinder.h"
 
 
-void PrintMazeMap(Maze* maze);
 void PrintPath(Path* path, int direction);
 void WritePath(FILE* output, Path* pWarplessPath, Path* pWarpablePath);
 void WritePathWorker(FILE* output, Path* path, int direction);
 void WriteNull(FILE* output);
-
-
-void PrintMazeMap(Maze* maze)
-{
-    int i, j;
-    int num;
-    Point PointBuf;
-
-    for (i = 0; i < maze->height; i++)
-    {
-        for (j = 0; j < maze->width; j++)
-        {
-            PointSet(&PointBuf, i, j);
-            num = MazePointVal(maze, PointBuf);
-
-            if (num == -3)
-                printf("*       ");
-            else if (num == -2)
-                printf("e(%03d)   ", num);
-            else if (num == -1)
-                printf("s       ");
-            else
-                printf("%-8d", num);
-        }
-        printf("\n\n");
-    }
-}
 
 void PrintPath(Path* path, int direction)
 {
