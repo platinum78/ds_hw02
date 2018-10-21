@@ -10,7 +10,7 @@ Susung Park (2014311254), School of Mechanical Engineering, SKKU
 Using the program is simple. Just following the instruction below.
 
 1. Open the assignment directory from the console.
-2. Compile the source via gcc by typing `gcc -o main.exe ./include/datatypes.c ./include/pathfinder.c ./main.c`
+2. Compile the source via gcc by typing `gcc -o main.exe ./include/datatypes.c ./include/pathfinder.c ./main.c`. If you're on Windows, you can simply execute `./compile.bat`.
 3. Put your input file in `{ASSIGNMENT_DIR}/io`. Input file should have the name `hw2_input.txt`.
 4. Run the program with no option.
 5. The output file will emerge in the same diredtory with the input file.
